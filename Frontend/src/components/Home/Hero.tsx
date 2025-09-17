@@ -31,12 +31,13 @@ export default function Hero() {
           </span>
 
           <h1 className="text-5xl md:text-7xl font-extrabold leading-tight">
-            Your AI Universe. <br /> One Platform.
+            Stop Switching. <br /> Start Creating.
           </h1>
 
           <p className="text-xl text-[#484848] max-w-lg">
-            Stop wasting time juggling tools — MiniSmart AI unites the
-            smartest models under one subscription.
+            Forget switching between apps and accounts—MiniSmart.
+            Ai unifies multiple powerful AI models into a single, seamless experience.
+            Compare, create, and enhance smarter than ever before.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mt-6 justify-center md:justify-start">

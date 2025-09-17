@@ -40,23 +40,6 @@ function PricingComponent() {
       subtitle: "Monthly Plan",
       price: "$6",
       features: [
-        { icon: <FaCheckCircle />, label: "3 Best AI models" },
-        { icon: <FaCheckCircle />, label: "500,000 tokens" },
-        { icon: <FaImage />, label: "Generate Images" },
-        { icon: <FaBolt />, label: "Enhance Prompt" },
-        { icon: <FaCheckCircle />, label: "Side-by-Side Comparison" },
-        {
-          icon: <FaBrain />,
-          label: "Models (GPT, DeepSeek, Gemini, Banana, Dalle)",
-        },
-      ],
-      button: "Get All 3 Models for $6/Month",
-    },
-    {
-      title: "Best Value",
-      subtitle: "Monthly Plan",
-      price: "$40",
-      features: [
         { icon: <FaCheckCircle />, label: "6 Best AI models" },
         { icon: <FaCheckCircle />, label: "1,000,000 tokens" },
         { icon: <FaImage />, label: "Generate Images" },
@@ -64,10 +47,27 @@ function PricingComponent() {
         { icon: <FaCheckCircle />, label: "Side-by-Side Comparison" },
         {
           icon: <FaBrain />,
-          label: "Models (GPT, DeepSeek, Gemini, Claude, Perplexity, Grok)",
+          label: "Models (GPT, DeepSeek, Gemini, LLama, Banana, Dalle)",
         },
       ],
-      button: "Get All 6 Models for $40/Month",
+      button: "Get All 6 Models for $6/Month",
+    },
+    {
+      title: "Best Value",
+      subtitle: "Monthly Plan",
+      price: "$40",
+      features: [
+        { icon: <FaCheckCircle />, label: "9 Best AI models" },
+        { icon: <FaCheckCircle />, label: "1,000,000 tokens" },
+        { icon: <FaImage />, label: "Generate Images" },
+        { icon: <FaBolt />, label: "Enhance Prompt" },
+        { icon: <FaCheckCircle />, label: "Side-by-Side Comparison" },
+        {
+          icon: <FaBrain />,
+          label: "Models (GPT, DeepSeek, Gemini, Claude, Perplexity, Grok, LLama, Banana, Dalle)",
+        },
+      ],
+      button: "Get All 9 Models for $40/Month",
     },
   ];
 

@@ -13,17 +13,17 @@ export default function Features() {
     () => [
       {
         title: 'Compare All Premium AIs at Once',
-        desc: 'Free AI models often deliver restricted and inferior answers. With AI Fiesta, you get access to multiple top-tier premium models, all in one place. Compare their responses side-by-side to experience faster, smarter, and most accurate answers.',
+        desc: 'Stop switching between apps to test different AIs. MiniSmart.Ai brings GPT, Gemini, DeepSeek, LLaMA, and more into a single platform. Instantly compare their answers side-by-side and discover which model gives you the smartest, fastest, and most accurate results for your task.',
         video: '/video.mp4',
       },
       {
-        title: 'Boost Your Productivity',
-        desc: 'No more switching between multiple apps. Get everything you need in one dashboard – research, writing, brainstorming – all powered by multiple AI brains working for you.',
+        title: 'Generate Stunning Images with AI',
+        desc: 'Bring your imagination to life with our integrated image generation feature. From professional graphics to creative artwork, MiniSmart.Ai lets you create high-quality visuals in seconds—powered by cutting-edge AI image models—all inside the same platform.',
         video: '/video.mp4',
       },
       {
-        title: 'Seamless Experience',
-        desc: 'Enjoy a clean, distraction-free interface optimized for speed and focus, so you can spend more time thinking and less time clicking.',
+        title: 'Enhance Your Prompts for Better Results',
+        desc: 'Writing the right prompt is key to getting powerful AI responses. With MiniSmart.Ai, you don’t have to be a prompt expert—our smart enhancer refines your input automatically, ensuring you always get clear, detailed, and highly accurate outputs across every model.',
         video: '/video.mp4',
       },
     ],
@@ -44,7 +44,7 @@ export default function Features() {
           viewport={{ once: true }}
           className="text-4xl md:text-6xl lg:text-8xl font-extrabold leading-tight dark:bg-gradient-to-r dark:from-btnBg dark:to-btnbg2 dark:bg-clip-text dark:text-transparent"
         >
-          Four AI Models.
+          Seven AI Models
           <br /> One Smart Platform
         </motion.h1>
 
