@@ -1,0 +1,28 @@
+{
+  "name": "mini-smart-ai",
+  "version": "1.0.0",
+  "description": "This will a smart Ai system which will help you to combine multiple ai systems.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Muhammad Zawar Shah",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.15.0",
+    "axios": "^1.11.0",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "mssql": "^11.0.1",
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.15.0"
+  }
+}
