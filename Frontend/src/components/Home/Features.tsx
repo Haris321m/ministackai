@@ -14,17 +14,17 @@ export default function Features() {
       {
         title: 'Compare All Premium AIs at Once',
         desc: 'Stop switching between apps to test different AIs. MiniSmart.Ai brings GPT, Gemini, DeepSeek, LLaMA, and more into a single platform. Instantly compare their answers side-by-side and discover which model gives you the smartest, fastest, and most accurate results for your task.',
-        video: '/video.mp4',
+        video: '/video1.mp4',
       },
       {
         title: 'Generate Stunning Images with AI',
         desc: 'Bring your imagination to life with our integrated image generation feature. From professional graphics to creative artwork, MiniSmart.Ai lets you create high-quality visuals in seconds—powered by cutting-edge AI image models—all inside the same platform.',
-        video: '/video.mp4',
+        video: '/video3.mp4',
       },
       {
         title: 'Enhance Your Prompts for Better Results',
         desc: 'Writing the right prompt is key to getting powerful AI responses. With MiniSmart.Ai, you don’t have to be a prompt expert—our smart enhancer refines your input automatically, ensuring you always get clear, detailed, and highly accurate outputs across every model.',
-        video: '/video.mp4',
+        video: '/video2.mp4',
       },
     ],
     []
