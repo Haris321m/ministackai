@@ -11,7 +11,7 @@ export default function Hero() {
 
   const handleStartNow = () => {
     if (!user) {
-      router.push("/login");
+      router.push("/Login");
     } else {
       router.push("/Model");
     }

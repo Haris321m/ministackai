@@ -19,7 +19,7 @@ export default function Callto() {
   const handleStartNow = useCallback(() => {
     try {
       if (!user) {
-        router.push("/login");
+        router.push("/Login");
       } else {
         router.push("/Model");
       }
