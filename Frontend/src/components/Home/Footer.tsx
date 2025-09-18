@@ -41,6 +41,9 @@ export default function Footer() {
           </li>
         </ul>
         <p className="text-sm md:text-lg text-gray-600 dark:text-gray-400 text-center md:text-right">
+          team@minismartai.com
+        </p>
+        <p className="text-sm md:text-lg text-gray-600 dark:text-gray-400 text-center md:text-right">
           &copy; {new Date().getFullYear()} MiniSmart AI. All rights reserved.
         </p>
       </div>

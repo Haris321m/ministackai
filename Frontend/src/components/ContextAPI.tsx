@@ -73,18 +73,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         try {
-          Cookies.set("token", data.token, { secure: true, sameSite: "Strict" });
-          Cookies.set("email", data.dbuser.Email ?? "", { secure: true, sameSite: "Strict" });
-          Cookies.set("name", data.dbuser.FirstName ?? "", { secure: true, sameSite: "Strict" });
-          Cookies.set("userId", data.dbuser.Id ?? "", { secure: true, sameSite: "Strict" });
-          Cookies.set("Role", data.dbuser.Role ?? "user", { secure: true, sameSite: "Strict" });
-          Cookies.set("planSubscribed", data.dbuser.planSubscribed ?? "false", {
-            secure: true,
-            sameSite: "Strict",
-          });
+          if (data.dbuser.Role === "admin") {
+            // admin ke liye session cookies
+            Cookies.set("token", data.token, { secure: true, sameSite: "Strict" });
+            Cookies.set("email", data.dbuser.Email ?? "", { secure: true, sameSite: "Strict" });
+            Cookies.set("name", data.dbuser.FirstName ?? "", { secure: true, sameSite: "Strict" });
+            Cookies.set("userId", data.dbuser.Id ?? "", { secure: true, sameSite: "Strict" });
+            Cookies.set("Role", data.dbuser.Role ?? "user", { secure: true, sameSite: "Strict" });
+            Cookies.set("planSubscribed", data.dbuser.planSubscribed ?? "false", {
+              secure: true,
+              sameSite: "Strict",
+            });
+          } else {
+            // normal user ke liye persistent cookies (7 din tak valid)
+            Cookies.set("token", data.token, { expires: 7, secure: true, sameSite: "Strict" });
+            Cookies.set("email", data.dbuser.Email ?? "", { expires: 7, secure: true, sameSite: "Strict" });
+            Cookies.set("name", data.dbuser.FirstName ?? "", { expires: 7, secure: true, sameSite: "Strict" });
+            Cookies.set("userId", data.dbuser.Id ?? "", { expires: 7, secure: true, sameSite: "Strict" });
+            Cookies.set("Role", data.dbuser.Role ?? "user", { expires: 7, secure: true, sameSite: "Strict" });
+            Cookies.set("planSubscribed", data.dbuser.planSubscribed ?? "false", {
+              expires: 7,
+              secure: true,
+              sameSite: "Strict",
+            });
+          }
         } catch (cookieErr) {
           safeLog("Cookie set error:", cookieErr);
         }
+
 
         setUser({
           id: data.dbuser.Id,
@@ -108,16 +124,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
-      const cookieKeys = ["userId", "token", "email", "name", "Role", "planSubscribed"];
-      cookieKeys.forEach((key) => {
-        try {
-          Cookies.remove(key);
-        } catch (err) {
-          safeLog(`Error removing cookie ${key}:`, err);
-        }
-      });
-
-      setUser(null);
+      const role = Cookies.get("Role");
+      if (role === "user") {
+        const cookieKeys = ["userId", "token", "email", "name", "Role", "planSubscribed"];
+        cookieKeys.forEach((key) => {
+          try {
+            Cookies.remove(key);
+          } catch (err) {
+            safeLog(`Error removing cookie ${key}:`, err);
+          }
+        });
+        setUser(null);
+      } else {
+        setUser(null);
+      }
       try {
         router.push("/Login");
       } catch (err) {
@@ -127,6 +147,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       safeLog("Logout error:", err);
     }
   }, [router]);
+
 
   useEffect(() => {
     try {
