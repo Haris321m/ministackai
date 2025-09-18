@@ -63,13 +63,22 @@ export default function Page() {
   const [enabledModels, setEnabledModels] = useState<{ [key: string]: boolean }>({});
   const [isImageRequest, setIsImageRequest] = useState(false);
   const [expandedModelId, setExpandedModelId] = useState<number | null>(null);
+  const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const { user, loading } = useAuth();
   const router = useRouter();
 
-  useEffect(() => {
-    if (loading) return; 
 
-    if (user === null) { 
+  useEffect(() => {
+    if (!textareaRef.current) return;
+    const el = textareaRef.current;
+    el.style.height = "auto";
+    el.style.height = Math.min(el.scrollHeight, 200) + "px";
+  }, [query]);
+
+  useEffect(() => {
+    if (loading) return;
+
+    if (user === null) {
       router.push('/Login');
       return;
     }
@@ -84,7 +93,7 @@ export default function Page() {
           },
         });
 
-        
+
         if (!res.ok) {
           router.push('/Pricing');
           return;
@@ -126,48 +135,56 @@ export default function Page() {
     })();
   }, [user]);
 
-useEffect(() => {
-  if (!activeConversation) return;
-  (async () => {
-    try {
-      const token = Cookies.get('token');
-      const res = await fetch(`${API_URL}/chats/${activeConversation.Id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!res.ok) throw new Error(`Failed to fetch chat history: ${res.status}`);
-      const history = await res.json();
-      if (!Array.isArray(history)) return;
-
-      const messageMap: { [modelId: number]: PlanMessage[] } = {};
-      history.forEach((h: any) => {
-        const model = plan?.Plan.PlanModels.find((pm) => pm.Models.Id === h.CurrentModelId);
-        if (!model) return;
-        if (!messageMap[model.Models.Id]) messageMap[model.Models.Id] = [];
-        messageMap[model.Models.Id].push({
-          query: h.UserQuestion,
-          reply: h.BotAnswer,
-          image: h.BotImages || undefined,
-          isNew: false,
+  useEffect(() => {
+    if (!activeConversation) return;
+    (async () => {
+      try {
+        const token = Cookies.get("token");
+        const res = await fetch(`${API_URL}/chats/${activeConversation.Id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-      });
+        if (!res.ok) throw new Error(`Failed to fetch chat history: ${res.status}`);
+        const history = await res.json();
+        console.log(history)
+        if (!Array.isArray(history)) return;
 
-      setPlan((prevPlan) => {
-        if (!prevPlan) return prevPlan;
-        return {
-          ...prevPlan,
-          Plan: {
-            PlanModels: prevPlan.Plan.PlanModels.map((pm) => ({
-              ...pm,
-              messages: messageMap[pm.Models.Id] || [],
-            })),
-          },
-        };
-      });
-    } catch (error) {
-      safeLog('Error fetching chat history:', error);
-    }
-  })();
-}, [activeConversation]);
+        const messageMap: { [modelId: number]: PlanMessage[] } = {};
+        history.forEach((h: any) => {
+          const model = plan?.Plan.PlanModels.find(
+            (pm) => pm.Models.Id === h.CurrentModelId
+          );
+          if (!model) return;
+          if (!messageMap[model.Models.Id]) messageMap[model.Models.Id] = [];
+          messageMap[model.Models.Id].push({
+            query: h.UserQuestion,
+            reply: h.BotAnswer,
+            image: h.BotImages || undefined,
+            isNew: false,
+          });
+        });
+
+        setPlan((prevPlan) => {
+          if (!prevPlan) return prevPlan;
+          return {
+            ...prevPlan,
+            Plan: {
+              PlanModels: prevPlan.Plan.PlanModels.map((pm) => {
+                const preserved = (pm.messages || []).filter((m) => m.isNew);
+                const historyMsgs = messageMap[pm.Models.Id] || [];
+                return {
+                  ...pm,
+                  messages: [...preserved, ...historyMsgs],
+                };
+              }),
+            },
+          };
+        });
+      } catch (error) {
+        safeLog("Error fetching chat history:", error);
+      }
+    })();
+  }, [activeConversation]);
+
 
 
   /** Add New Message */
@@ -241,6 +258,7 @@ useEffect(() => {
             c.Id === conversation!.Id ? { ...c, Title: firstWords } : c
           )
         );
+
       }
 
       let activeModels = plan.Plan.PlanModels
@@ -373,42 +391,42 @@ useEffect(() => {
   };
 
   /** Handle Enhance */
-const handleEnhance = async () => {
-  if (!query.trim()) return;
-  try {
-    const token = Cookies.get('token');
-    const res = await fetch(`${API_URL}/chatcompletions/enhance`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        userId: user?.id,
-        modelid: plan?.Plan.PlanModels.filter(
-          (pm) => enabledModels[pm.Models.Id]
-        )
-          .filter((pm) => pm.Models.Type === 'chat')
-          .map((m) => m.Models.Id),
-        messages: [
-          {
-            role: 'system',
-            content:
-              'You are a prompt enhancer. Rewrite ONLY the user prompt to make it more detailed, clear, and effective. Do not add greetings, explanations, or any extra conversation. Return only the enhanced prompt as plain text.',
-          },
-          { role: 'user', content: query },
-        ],
-        type: 'enhance',
-        prompt: query,
-      }),
-    });
-    if (!res.ok) throw new Error('Enhance request failed');
-    const data = await res.json();
-    if (data?.message?.BotAnswer) setQuery(data.message.BotAnswer);
-  } catch (err) {
-    safeLog('Error enhancing prompt:', err);
-  }
-};
+  const handleEnhance = async () => {
+    if (!query.trim()) return;
+    try {
+      const token = Cookies.get('token');
+      const res = await fetch(`${API_URL}/chatcompletions/enhance`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: user?.id,
+          modelid: plan?.Plan.PlanModels.filter(
+            (pm) => enabledModels[pm.Models.Id]
+          )
+            .filter((pm) => pm.Models.Type === 'chat')
+            .map((m) => m.Models.Id),
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are a prompt enhancer. Rewrite ONLY the user prompt to make it more detailed, clear, and effective. Do not add greetings, explanations, or any extra conversation. Return only the enhanced prompt as plain text.',
+            },
+            { role: 'user', content: query },
+          ],
+          type: 'enhance',
+          prompt: query,
+        }),
+      });
+      if (!res.ok) throw new Error('Enhance request failed');
+      const data = await res.json();
+      if (data?.message?.BotAnswer) setQuery(data.message.BotAnswer);
+    } catch (err) {
+      safeLog('Error enhancing prompt:', err);
+    }
+  };
 
 
 
@@ -500,11 +518,12 @@ const handleEnhance = async () => {
           <div className="flex flex-col w-full sm:w-md md:w-xl lg:w-xl xl:w-3xl bg-white dark:bg-gray-800 p-2 mb-2 rounded-lg overflow-hidden">
             <div className="flex w-full items-end gap-3 p-2 rounded-2xl transition-all duration-300">
               <textarea
+                ref={textareaRef}
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 onInput={e => {
                   const target = e.target as HTMLTextAreaElement;
-                  target.style.height = 'auto';
+                  target.style.height = "auto";
                   requestAnimationFrame(() => {
                     target.style.height = Math.min(target.scrollHeight, 200) + "px";
                   });
@@ -519,6 +538,7 @@ const handleEnhance = async () => {
                 placeholder="Type your message..."
                 className="flex-1 p-4 rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none shadow-inner focus:shadow-[0_0_10px_rgba(59,130,246,0.4)]"
               />
+
 
               {/* Send Button */}
               <button

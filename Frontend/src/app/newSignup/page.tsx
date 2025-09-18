@@ -168,17 +168,6 @@ export default function NewSignUp() {
               Login
             </span>
           </p>
-
-          <div className="border-t pt-4">
-            <p className="text-sm mb-3">Or sign up with</p>
-            <button
-              type="button"
-              className="py-3 w-full border border-gray-300 dark:border-gray-600 text-lg rounded-lg flex justify-center items-center gap-3 hover:bg-[#7d68ff]/10 transition"
-            >
-              <img src="/google-icon.svg" alt="Google" className="w-6 h-6" />
-              Google
-            </button>
-          </div>
         </div>
       </div>
     </div>

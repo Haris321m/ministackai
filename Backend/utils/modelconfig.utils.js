@@ -17,6 +17,8 @@ async function modelUse(modelName, input) {
       model: modelName,
       prompt: input[0].prompt,
       size: input[0].size || "1024x1024",
+      quality: "standard",
+      response_format: "b64_json",
     };
 
     const response = await axios.post(API_URL, payload, {
@@ -26,7 +28,7 @@ async function modelUse(modelName, input) {
       },
     });
     console.log(response.data)
-    const imageUrl = response.data?.data?.[0]?.url || null;
+    const imageUrl = response.data?.data?.[0]?.b64_json || null;
     const revised_prompt = response.data?.data?.[0]?.revised_prompt || null;
 
     return {

@@ -10,7 +10,7 @@ import remarkGfm from "remark-gfm";
 
 /* --------- Disable console.error globally (silent mode) --------- */
 if (typeof window !== "undefined") {
-  console.error = () => {};
+  console.error = () => { };
 }
 
 /* ---------------- Typing Animation ---------------- */
@@ -33,7 +33,7 @@ function TypingAnimation({ text }: { text: string }) {
       }, 20);
 
       return () => clearInterval(interval);
-    } catch {}
+    } catch { }
   }, [text]);
 
   return (
@@ -81,7 +81,7 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
   const safeCopy = () => {
     try {
       navigator.clipboard.writeText(code);
-    } catch {}
+    } catch { }
   };
 
   return (
@@ -110,14 +110,40 @@ function CodeBlock({ language, code }: { language: string; code: string }) {
 /* ---------------- Download Helper ---------------- */
 function downloadImage(url: string) {
   try {
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "minismartAi.png";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch {}
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // agar CORS allow ho
+    img.src = url;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      ctx.drawImage(img, 0, 0);
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "minismartAi.png"; // original resolution me hoga
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+      }, "image/png");
+    };
+
+    img.onerror = () => {
+      alert("Image download failed. Server may block direct access.");
+    };
+  } catch (e) {
+    console.error("Error downloading image:", e);
+  }
 }
+
 
 /* ---------------- Main Chat ---------------- */
 export default function Chat({
@@ -140,7 +166,7 @@ export default function Chat({
           behavior: "smooth",
         });
       }
-    } catch {}
+    } catch { }
   }, [messages]);
 
   return (
@@ -161,7 +187,7 @@ export default function Chat({
                 onClick={() => {
                   try {
                     onCollapse();
-                  } catch {}
+                  } catch { }
                 }}
               />
             ) : (
@@ -170,7 +196,7 @@ export default function Chat({
                 onClick={() => {
                   try {
                     onToggleExpand();
-                  } catch {}
+                  } catch { }
                 }}
               />
             )}
@@ -181,7 +207,7 @@ export default function Chat({
                 onChange={() => {
                   try {
                     onToggleEnabled();
-                  } catch {}
+                  } catch { }
                 }}
                 className="sr-only peer"
               />
@@ -210,15 +236,24 @@ export default function Chat({
                   {msg.image && (
                     <div className="relative group w-fit">
                       <img
-                        src={msg.image}
+                        src={
+                          msg.image.startsWith("data:image")
+                            ? msg.image
+                            : `data:image/png;base64,${msg.image}`
+                        }
                         alt="Generated"
                         className="rounded-lg max-w-full border border-gray-400 dark:border-gray-600"
                       />
                       <button
                         onClick={() => {
                           try {
-                            msg.image && downloadImage(msg.image);
-                          } catch {}
+                            msg.image &&
+                              downloadImage(
+                                msg.image.startsWith("data:image")
+                                  ? msg.image
+                                  : `data:image/png;base64,${msg.image}`
+                              );
+                          } catch { }
                         }}
                         className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 text-white text-xs px-2 py-2 rounded flex items-center gap-1 transition"
                       >
@@ -227,38 +262,42 @@ export default function Chat({
                     </div>
                   )}
 
+
                   {/* Reply */}
                   {msg.reply && (
                     <div className="prose dark:prose-invert whitespace-pre-wrap">
                       <ReactMarkdown
                         remarkPlugins={[remarkGfm]}
                         components={{
-                          code({ inline, className, children, ...props }) {
-                            try {
-                              const match = /language-(\w+)/.exec(
-                                className || ""
+                          code: (props) => {
+                            const { children, className, inline, ...rest } = props as {
+                              children: React.ReactNode;
+                              className?: string;
+                              inline?: boolean;
+                            };
+
+                            const match = /language-(\w+)/.exec(className || "");
+
+                            if (!inline && match) {
+                              return (
+                                <CodeBlock language={match[1]} code={String(children)} />
                               );
-                              return !inline && match ? (
-                                <CodeBlock
-                                  language={match[1]}
-                                  code={String(children)}
-                                />
-                              ) : (
-                                <code
-                                  className="bg-gray-200 dark:bg-gray-700 px-1 rounded"
-                                  {...props}
-                                >
-                                  {children}
-                                </code>
-                              );
-                            } catch {
-                              return <code>{children}</code>;
                             }
+
+                            return (
+                              <code
+                                className="bg-gray-200 dark:bg-gray-700 px-1 rounded"
+                                {...rest}
+                              >
+                                {children}
+                              </code>
+                            );
                           },
                         }}
                       >
                         {msg.reply}
                       </ReactMarkdown>
+
                     </div>
                   )}
                 </div>
