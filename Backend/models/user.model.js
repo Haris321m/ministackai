@@ -10,7 +10,7 @@ class UserModel {
         // Password hash
         data.PasswordHash = await hash(data.password, 10);
 
-        // Step 1: User create karo
+        // Step 1: Create User
         const user = await prisma.users.create({
             data: {
                 FirstName: data.FirstName,
@@ -21,19 +21,27 @@ class UserModel {
             }
         });
 
-        
+        // Step 2: Find free plan (Price = 0)
         const freePlan = await prisma.plans.findFirst({
             where: { Price: 0.0 }
         });
 
-       
         if (freePlan) {
+            const startAt = new Date();
+            const endAt = new Date(startAt);
+            // add DurationDays to current date
+            if (freePlan.DurationDays && freePlan.DurationDays > 0) {
+                endAt.setDate(startAt.getDate() + freePlan.DurationDays);
+            }
+
             await prisma.userPlans.create({
                 data: {
                     UserId: user.Id,
                     PlanId: freePlan.Id,
-                    StartDate: new Date(),
-                    
+                    StartAt: startAt,
+                    EndAt: endAt,
+                    Status: "active", // optional, depending on your schema
+                    AutoRenew: false   // optional, depending on your schema
                 }
             });
         }
@@ -44,6 +52,7 @@ class UserModel {
         throw error;
     }
 }
+
 
     static async getuserByEmail(email){
         try {

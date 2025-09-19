@@ -173,7 +173,7 @@ export default function Chat({
     <div className={`relative ${isExpanded ? "w-full" : "w-[500px]"}`}>
       <div
         ref={chatContainerRef}
-        className={`chat-scrollbar relative ${isExpanded ? "w-full" : "w-[500px]"} shrink-0 overflow-y-auto h-[80vh] border-x border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-inner transition-all duration-300`}
+        className={`chat-scrollbar relative ${isExpanded ? "w-full" : "max-h-[calc(100dvh-120px)] w-[390px] md:w-[500px]"} shrink-0 overflow-y-auto h-[80vh] border-x border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 rounded-lg shadow-inner transition-all duration-300`}
       >
         {/* Header */}
         <div className="sticky top-0 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 py-3 px-4 flex justify-between">

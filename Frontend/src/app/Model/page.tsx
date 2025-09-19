@@ -312,7 +312,7 @@ export default function Page() {
         }),
       });
 
-      
+
 
       if (res.status === 403) {
         console.log(res.status)
@@ -525,7 +525,7 @@ export default function Page() {
         </div>
 
         {/* Input Area */}
-        <div className="fixed bottom-0 left-0 w-full flex justify-center shadow-md">
+        <div className="sticky bottom-0 left-0 top-2 w-full flex justify-center shadow-md">
           <div className="flex flex-col w-full sm:w-md md:w-xl lg:w-xl xl:w-3xl bg-white dark:bg-gray-800 p-2 mb-2 rounded-lg overflow-hidden">
             <div className="flex w-full items-end gap-3 p-2 rounded-2xl transition-all duration-300">
               <textarea
@@ -547,19 +547,20 @@ export default function Page() {
                 }}
                 rows={1}
                 placeholder="Type your message..."
-                className="flex-1 p-4 rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none shadow-inner focus:shadow-[0_0_10px_rgba(59,130,246,0.4)]"
+                className="flex-1 p-2 md:p-4 rounded-2xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 resize-none shadow-inner focus:shadow-[0_0_10px_rgba(59,130,246,0.4)]"
               />
 
 
               {/* Send Button */}
               <button
                 onClick={handleSend}
-                className="bg-gradient-to-r from-blue-500 to-green-500 text-white px-3 py-3 rounded-full font-semibold shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200 ease-in-out"
+                className="hidden md:block bg-gradient-to-r from-blue-500 to-green-500 text-white p-1 md:p-3 rounded-full font-semibold shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200 ease-in-out"
               >
                 <GoArrowUp className='text-4xl font-bold' />
               </button>
             </div>
             <div className='flex justify-between'>
+
               <button
                 onClick={() => setIsImageRequest(prev => !prev)}
                 className={`ml-4 py-2 px-5 rounded-full flex items-center gap-2 font-medium shadow-md transition-all duration-300 ease-in-out transform dark:text-white hover:scale-105 active:scale-95 hover:cursor-pointer
@@ -568,12 +569,20 @@ export default function Page() {
                 <IoImageOutline className={`text-xl ${isImageRequest ? 'rotate-12 scale-110' : ''}`} />
                 <span>{isImageRequest ? 'Image Mode' : 'Text Mode'}</span>
               </button>
+              <div className='flex gap-2'>
               <button
                 onClick={handleEnhance}
-                className="bg-gray-300 dark:bg-gray-900 mr-20 text-white px-4 py-2 rounded-full font-medium shadow-md hover:scale-105 active:scale-95 transition-transform duration-200 ease-in-out"
+                className="bg-gray-300 dark:bg-gray-900 mr-0 md:mr-20 text-white px-4 py-2 rounded-full font-medium shadow-md hover:scale-105 active:scale-95 transition-transform duration-200 ease-in-out"
               >
                 ✨
               </button>
+              <button
+                onClick={handleSend}
+                className="block md:hidden bg-gradient-to-r from-blue-500 to-green-500 text-white  p-1 md:p-3 mr-3 rounded-full font-semibold shadow-lg hover:scale-105 active:scale-95 transition-transform duration-200 ease-in-out"
+              >
+                <GoArrowUp className='text-4xl font-bold' />
+              </button>
+              </div>
             </div>
           </div>
         </div>
