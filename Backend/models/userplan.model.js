@@ -84,8 +84,9 @@ class UserPlanModel {
 
   static async updateUserPlan(id, data) {
     try {
-      return await prisma.userPlans.update({
-        where: { Id: id },
+      console.log(data)
+      return await prisma.userPlans.updateMany({
+        where: { UserId: id },
         data: { ...data },
       });
     } catch (error) {

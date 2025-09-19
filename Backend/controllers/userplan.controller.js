@@ -40,7 +40,9 @@ function getAllUserPlans(req, res) {
 }
 
 function updateUserPlan(req, res) {
+    console.log(req.body)
     const id = parseInt(req.params.id, 10);
+    console.log(id)
     const data = req.body;
     UserPlanModel.updateUserPlan(id, data)
         .then((userplan) => {

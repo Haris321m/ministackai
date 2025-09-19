@@ -8,6 +8,7 @@ import { IoImageOutline } from 'react-icons/io5';
 import { GoArrowUp } from 'react-icons/go';
 import Cookies from 'js-cookie';
 import { useRouter } from 'next/navigation';
+import { useModal } from "@/components/ModalProvider";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -66,6 +67,7 @@ export default function Page() {
   const textareaRef = React.useRef<HTMLTextAreaElement | null>(null);
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { showAlert, showConfirm } = useModal();
 
 
   useEffect(() => {
@@ -309,6 +311,15 @@ export default function Page() {
           prompt: sentQuery,
         }),
       });
+
+      console.log(await res.json())
+      
+      if (res.status === 403) {
+  console.log(res.status)
+  const err = await res.json().catch(() => null);
+  await showAlert(err?.error || "Plan limit reached. Upgrade to continue.");
+  return;
+}
 
       if (!res.body) return;
 

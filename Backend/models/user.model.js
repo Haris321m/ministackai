@@ -5,25 +5,46 @@ const prisma = new PrismaClient();
 
 
 class UserModel {
-    static async createuser(data){
-        try {
-            data.PasswordHash= await hash(data.password, 10);
-            const user= await prisma.users.create({
+    static async createuser(data) {
+    try {
+        // Password hash
+        data.PasswordHash = await hash(data.password, 10);
+
+        // Step 1: User create karo
+        const user = await prisma.users.create({
             data: {
-                     FirstName: data.FirstName,
-                     LastName: data.LastName,
-                     Email: data.Email,
-                     PasswordHash: data.PasswordHash, 
-                     Role: data.Role || 'user',
-                 }
-        })
-        console.log(user)
-        return user;
-        } catch (error) {
-            console.log(error)
-            return error;
+                FirstName: data.FirstName,
+                LastName: data.LastName,
+                Email: data.Email,
+                PasswordHash: data.PasswordHash,
+                Role: data.Role || 'user',
+            }
+        });
+
+        
+        const freePlan = await prisma.plans.findFirst({
+            where: { Price: 0.0 }
+        });
+
+       
+        if (freePlan) {
+            await prisma.userPlans.create({
+                data: {
+                    UserId: user.Id,
+                    PlanId: freePlan.Id,
+                    StartDate: new Date(),
+                    
+                }
+            });
         }
+
+        return user;
+    } catch (error) {
+        console.log(error);
+        throw error;
     }
+}
+
     static async getuserByEmail(email){
         try {
             const user= await prisma.users.findUnique({
