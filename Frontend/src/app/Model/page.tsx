@@ -312,14 +312,14 @@ export default function Page() {
         }),
       });
 
-      console.log(await res.json())
       
+
       if (res.status === 403) {
-  console.log(res.status)
-  const err = await res.json().catch(() => null);
-  await showAlert(err?.error || "Plan limit reached. Upgrade to continue.");
-  return;
-}
+        console.log(res.status)
+        const err = await res.json().catch(() => null);
+        await showAlert(err?.error || "Plan limit reached. Upgrade to continue.");
+        return;
+      }
 
       if (!res.body) return;
 

@@ -26,7 +26,7 @@ app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 const allowedOrigins = [
   "https://minismartai.com",   
   "https://www.minismartai.com",
-  // "http://localhost:3000" 
+  "http://localhost:3000" 
 ];
 
 
