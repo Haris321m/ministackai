@@ -40,25 +40,26 @@ model Chats {
 }
 
 model Conversations {
-  Id                    Int                    @id(map: "PK__Conversa__3214EC07B9672562") @default(autoincrement())
+  Id                    Int                     @id(map: "PK__Conversa__3214EC07B9672562") @default(autoincrement())
   UserId                Int?
-  Title                 String?                @db.NVarChar(200)
-  CreatedAt             DateTime?              @default(now(), map: "DF__Conversat__Creat__403A8C7D") @db.DateTime
+  Title                 String?                 @db.NVarChar(200)
+  CreatedAt             DateTime?               @default(now(), map: "DF__Conversat__Creat__403A8C7D") @db.DateTime
   Chats                 Chats[]
-  Users                 Users?                 @relation(fields: [UserId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK__Conversat__UserI__412EB0B6")
-  ConversationSummaries ConversationSummaries?
+  Users                 Users?                  @relation(fields: [UserId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK__Conversat__UserI__412EB0B6")
+  ConversationSummaries ConversationSummaries[]
 }
 
 model Models {
-  Id          Int          @id(map: "PK__Models__3214EC074271FB70") @default(autoincrement())
-  Name        String?      @db.NVarChar(255)
-  Provider    String?      @db.NVarChar(100)
-  Type        String?      @db.NVarChar(50)
-  CreatedAt   DateTime?    @default(now(), map: "DF__Models__CreatedA__3D5E1FD2") @db.DateTime
-  ModelFamily String?      @db.NVarChar(50)
-  Chats       Chats[]
-  PlanModels  PlanModels[]
-  UsageLogs   UsageLogs[]
+  Id                    Int                     @id(map: "PK__Models__3214EC074271FB70") @default(autoincrement())
+  Name                  String?                 @db.NVarChar(255)
+  Provider              String?                 @db.NVarChar(100)
+  Type                  String?                 @db.NVarChar(50)
+  CreatedAt             DateTime?               @default(now(), map: "DF__Models__CreatedA__3D5E1FD2") @db.DateTime
+  ModelFamily           String?                 @db.NVarChar(50)
+  Chats                 Chats[]
+  ConversationSummaries ConversationSummaries[]
+  PlanModels            PlanModels[]
+  UsageLogs             UsageLogs[]
 }
 
 model sysdiagrams {
@@ -167,10 +168,25 @@ model UserImages {
 
 model ConversationSummaries {
   Id             Int           @id(map: "PK__Conversa__3214EC0720FDB4BE") @default(autoincrement())
-  ConversationId Int           @unique(map: "UQ_Conversation")
+  ConversationId Int
   UserId         Int
   Summary        String        @db.NVarChar(Max)
   UpdatedAt      DateTime?     @default(now(), map: "DF__Conversat__Updat__0B91BA14") @db.DateTime
+  ModelId        Int?
   Conversations  Conversations @relation(fields: [ConversationId], references: [Id], onUpdate: NoAction, map: "FK_Conversation")
+  Models         Models?       @relation(fields: [ModelId], references: [Id], onDelete: NoAction, onUpdate: NoAction, map: "FK_ConversationSummaries_Models")
   Users          Users         @relation(fields: [UserId], references: [Id], onUpdate: NoAction, map: "FK_SummaryUser")
+
+  @@unique([ConversationId, UserId, ModelId], map: "UQ_ConversationId_UserId_ModelId")
+}
+
+model otptable {
+  Id           Int       @id(map: "PK__otptable__3214EC07FCB62B87") @default(autoincrement())
+  FirstName    String?   @db.VarChar(40)
+  LastName     String?   @db.VarChar(30)
+  Email        String?   @db.VarChar(100)
+  PasswordHash String?   @db.VarChar(200)
+  Status       String    @default("Active", map: "DF__otptable__Status__29221CFB") @db.VarChar(20)
+  CreatedAt    DateTime? @default(now(), map: "DF__otptable__Create__2A164134")
+  Otp          String?   @db.Char(6)
 }

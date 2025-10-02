@@ -1,4 +1,7 @@
 import UserPlanModel from "../models/userplan.model.js";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new  PrismaClient ();
 
 function createUserPlan(req, res) {
     const data = req.body;
@@ -45,8 +48,16 @@ function updateUserPlan(req, res) {
     console.log(id)
     const data = req.body;
     UserPlanModel.updateUserPlan(id, data)
-        .then((userplan) => {
+        .then(async(userplan) => {
             if (userplan) {
+                await prisma.usageLogs.updateMany({
+                    where:{
+                        UserId:Number(id)
+                    },
+                    data :{
+                        TokensUsed : Number(0)
+                    }
+                })
                 res.status(200).json(userplan);
             } else {
                 res.status(404).json({ error: 'User plan not found' });

@@ -5,31 +5,38 @@ const prisma = new PrismaClient();
 
 
 class UserModel {
-    static async createuser(data) {
+   static async createuser(data) {
     try {
-        // Password hash
-        data.PasswordHash = await hash(data.password, 10);
+        // Check agar password ya PasswordHash aya hai
+        if (data.password) {
+            data.PasswordHash = await hash(data.password, 10);
+        } else if (data.PasswordHash) {
+            // Agar plain text diya hai (jaise "123"), usko hash karo
+            data.PasswordHash = await hash(data.PasswordHash, 10);
+        } else {
+            // Agar dono missing hain (e.g., Google login), ek dummy password assign karo
+            data.PasswordHash = await hash("default@123", 10);
+        }
 
-        // Step 1: Create User
         const user = await prisma.users.create({
             data: {
                 FirstName: data.FirstName,
                 LastName: data.LastName,
                 Email: data.Email,
                 PasswordHash: data.PasswordHash,
-                Role: data.Role || 'user',
-            }
+                Role: data.Role || "user",
+            },
         });
 
-        // Step 2: Find free plan (Price = 0)
+        // Free plan logic (same as tumne likha hai)
         const freePlan = await prisma.plans.findFirst({
-            where: { Price: 0.0 }
+            where: { Price: 0.0 },
         });
 
         if (freePlan) {
             const startAt = new Date();
             const endAt = new Date(startAt);
-            // add DurationDays to current date
+
             if (freePlan.DurationDays && freePlan.DurationDays > 0) {
                 endAt.setDate(startAt.getDate() + freePlan.DurationDays);
             }
@@ -40,9 +47,9 @@ class UserModel {
                     PlanId: freePlan.Id,
                     StartAt: startAt,
                     EndAt: endAt,
-                    Status: "active", // optional, depending on your schema
-                    AutoRenew: false   // optional, depending on your schema
-                }
+                    Status: "active",
+                    AutoRenew: false,
+                },
             });
         }
 
@@ -52,6 +59,7 @@ class UserModel {
         throw error;
     }
 }
+
 
 
     static async getuserByEmail(email){
@@ -88,6 +96,7 @@ class UserModel {
     }
     static async updateUser(id, data){
         try {
+            console.log(data)
             
             if(data.PasswordHash){
                 data.PasswordHash= await hash(data.PasswordHash, 10);
@@ -104,6 +113,32 @@ class UserModel {
                 Role : data.Role
             }
         })
+        return user;
+        }
+        catch (error) {
+            console.log(error)
+            return error;
+        }
+    }
+    static async updatepassUser(data){
+        try {
+            
+            if(data.PasswordHash){
+                data.PasswordHash= await hash(data.PasswordHash, 10);
+            }
+            const user= await prisma.users.updateMany({
+            where:{
+                Email:data.Email
+            },
+            data:{
+                FirstName:data.FirstName,
+                LastName:data.LastName,
+                Email:data.Email,
+                PasswordHash : data.PasswordHash,
+                Role : data.Role
+            }
+        })
+        
         return user;
         }
         catch (error) {

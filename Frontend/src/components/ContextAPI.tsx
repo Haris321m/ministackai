@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
 
@@ -26,7 +27,10 @@ type AuthContextType = {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  signup: (userData: { FirstName: string; LastName?: string; Email: string; password: string }) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
 };
+
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -36,7 +40,6 @@ export const useAuth = () => {
   return ctx;
 };
 
-// ✅ safe logger (no red screen)
 const safeLog = (msg: string, data?: unknown) => {
   if (process.env.NODE_ENV === "development") {
     console.warn(msg, data ?? "");
@@ -47,6 +50,82 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  const signup = useCallback(
+    async (userData: { FirstName: string; LastName?: string; Email: string; password: string }) => {
+      try {
+        const res = await fetch(`${API_URL}/users/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(userData),
+        });
+
+        if (!res.ok) {
+          safeLog("Signup failed:", res.statusText);
+          return;
+        }
+
+        const data = await res.json().catch(() => null);
+        if (!data?.dbuser || !data?.token) {
+          safeLog("Invalid signup response");
+          return;
+        }
+
+        Cookies.set("token", data.token, { expires: 7, secure: true, sameSite: "Strict" });
+        Cookies.set("email", data.dbuser.Email ?? "", { expires: 7, secure: true, sameSite: "Strict" });
+        Cookies.set("name", data.dbuser.FirstName ?? "", { expires: 7, secure: true, sameSite: "Strict" });
+        Cookies.set("userId", data.dbuser.Id ?? "", { expires: 7, secure: true, sameSite: "Strict" });
+        Cookies.set("Role", data.dbuser.Role ?? "user", { expires: 7, secure: true, sameSite: "Strict" });
+        Cookies.set("planSubscribed", data.dbuser.planSubscribed ?? "false", {
+          expires: 7,
+          secure: true,
+          sameSite: "Strict",
+        });
+
+        setUser({
+          id: data.dbuser.Id,
+          name: data.dbuser.FirstName,
+          token: data.token,
+          Role: data.dbuser.Role,
+          planSubscribed: data.dbuser.planSubscribed === "true",
+        });
+
+        router.push("/");
+      } catch (err) {
+        safeLog("Signup error:", err);
+      }
+    },
+    [router]
+  );
+
+  const loginWithGoogle = async (idToken: string) => {
+    try {
+      const res = await axios.post(`${API_URL}/users/google`, { idToken });
+
+      if (res.data?.token && res.data?.dbuser) {
+        Cookies.set("token", res.data.token, {
+          expires: 7,
+          secure: true,
+          sameSite: "Strict",
+        });
+
+        setUser({
+          id: res.data.dbuser.Id,
+          name: res.data.dbuser.FirstName,
+          token: res.data.token,
+          Role: res.data.dbuser.Role,
+          planSubscribed: res.data.dbuser.planSubscribed === "true",
+        });
+      }
+
+      return res.data?.dbuser;
+    } catch (err) {
+      console.error("Google login failed", err);
+      throw err;
+    }
+  };
+
+
 
   const login = useCallback(
     async (email: string, password: string) => {
@@ -74,7 +153,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         try {
           if (data.dbuser.Role === "admin") {
-            // admin ke liye session cookies
             Cookies.set("token", data.token, { secure: true, sameSite: "Strict" });
             Cookies.set("email", data.dbuser.Email ?? "", { secure: true, sameSite: "Strict" });
             Cookies.set("name", data.dbuser.FirstName ?? "", { secure: true, sameSite: "Strict" });
@@ -85,7 +163,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               sameSite: "Strict",
             });
           } else {
-            // normal user ke liye persistent cookies (7 din tak valid)
             Cookies.set("token", data.token, { expires: 7, secure: true, sameSite: "Strict" });
             Cookies.set("email", data.dbuser.Email ?? "", { expires: 7, secure: true, sameSite: "Strict" });
             Cookies.set("name", data.dbuser.FirstName ?? "", { expires: 7, secure: true, sameSite: "Strict" });
@@ -100,7 +177,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } catch (cookieErr) {
           safeLog("Cookie set error:", cookieErr);
         }
-
 
         setUser({
           id: data.dbuser.Id,
@@ -171,9 +247,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ user, loading, login, logout }),
-    [user, loading, login, logout]
+    () => ({ user, loading, login, logout, signup, loginWithGoogle }), 
+    [user, loading, login, logout, signup, loginWithGoogle]
   );
+
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

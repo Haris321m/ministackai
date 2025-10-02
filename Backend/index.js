@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import router from './routes/server.js';
 import dotenv from 'dotenv';
 import path from "path";
-
+import "./utils/cleanup.js"
 dotenv.config({ override: true });
 
 const app = express();
@@ -21,6 +21,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
+app.use((req, res, next) => {
+  res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  next();
+});
 
 
 const allowedOrigins = [

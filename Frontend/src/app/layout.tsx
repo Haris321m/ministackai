@@ -4,6 +4,7 @@ import "./globals.css";
 import HeaderWrapper from "@/components/HeaderWrapper";
 import { AuthProvider } from "@/components/ContextAPI";
 import { ModalProvider } from "@/components/ModalProvider";
+import GoogleProviderWrapper from "@/components/GoogleProviderWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,21 +23,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-
-
+}) {
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
         <AuthProvider>
-          <ModalProvider>
-            <HeaderWrapper />
-            {children}
-          </ModalProvider>
+          <GoogleProviderWrapper>
+            <ModalProvider>
+              <HeaderWrapper />
+              {children}
+            </ModalProvider>
+          </GoogleProviderWrapper>
         </AuthProvider>
       </body>
     </html>

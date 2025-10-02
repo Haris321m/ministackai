@@ -1,6 +1,7 @@
 'use client';
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
+import { Sparkles, Image, Wand2 } from 'lucide-react'; // icons for features
 
 const safeLog = (msg: string, data?: unknown) => {
   if (process.env.NODE_ENV === 'development') {
@@ -15,16 +16,19 @@ export default function Features() {
         title: 'Compare All Premium AIs at Once',
         desc: 'Stop switching between apps to test different AIs. MiniSmart.Ai brings GPT, Gemini, DeepSeek, LLaMA, and more into a single platform. Instantly compare their answers side-by-side and discover which model gives you the smartest, fastest, and most accurate results for your task.',
         video: '/video1.mp4',
+        icon: <Sparkles size={30} className="text-[#7d68ff]" />,
       },
       {
         title: 'Generate Stunning Images with AI',
         desc: 'Bring your imagination to life with our integrated image generation feature. From professional graphics to creative artwork, MiniSmart.Ai lets you create high-quality visuals in seconds—powered by cutting-edge AI image models—all inside the same platform.',
         video: '/video3.mp4',
+        icon: <Image size={30} className="text-[#6be0ff]" />,
       },
       {
         title: 'Enhance Your Prompts for Better Results',
         desc: 'Writing the right prompt is key to getting powerful AI responses. With MiniSmart.Ai, you don’t have to be a prompt expert—our smart enhancer refines your input automatically, ensuring you always get clear, detailed, and highly accurate outputs across every model.',
         video: '/video2.mp4',
+        icon: <Wand2 size={30} className="text-[#00ffd5]" />,
       },
     ],
     []
@@ -33,8 +37,13 @@ export default function Features() {
   return (
     <section
       id="features"
-      className="relative py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800"
+      className="relative py-24 overflow-hidden bg-gradient-to-b from-white to-gray-50 dark:from-gray-950 dark:to-gray-900"
     >
+      {/* Liquid animated blobs */}
+      <div className="absolute -top-20 -left-20 w-72 h-72 bg-[#7d68ff] opacity-25 blur-3xl rounded-full animate-pulse"></div>
+      <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-[#6be0ff] opacity-25 blur-3xl rounded-full animate-ping"></div>
+      <div className="absolute top-1/2 left-1/3 w-96 h-96 bg-[#00ffd5] opacity-20 blur-3xl rounded-full animate-pulse"></div>
+
       <div className="container mx-auto px-6 md:px-10 text-center relative z-10">
         {/* Title */}
         <motion.h1
@@ -42,7 +51,7 @@ export default function Features() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-6xl lg:text-8xl font-extrabold leading-tight dark:bg-gradient-to-r dark:from-btnBg dark:to-btnbg2 dark:bg-clip-text dark:text-transparent"
+          className="text-4xl md:text-6xl lg:text-7xl font-extrabold leading-tight dark:bg-gradient-to-r dark:from-[#7d68ff] dark:to-[#6be0ff] dark:bg-clip-text dark:text-transparent drop-shadow-md"
         >
           Seven AI Models
           <br /> One Smart Platform
@@ -50,7 +59,7 @@ export default function Features() {
 
         {/* Features */}
         <motion.div
-          className="flex flex-col gap-14 mt-20"
+          className="flex flex-col gap-16 mt-20"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
@@ -67,11 +76,12 @@ export default function Features() {
                 visible: { opacity: 1, y: 0 },
               }}
               transition={{ duration: 0.7, ease: 'easeOut' }}
-              className={`flex flex-col lg:flex-row items-center gap-10 
-                bg-gradient-to-r from-btnBg to-btnbg2 p-6 lg:p-12 rounded-3xl 
-                shadow-xl hover:shadow-2xl hover:shadow-btnBg/30 
+              className={`flex flex-col lg:flex-row items-center gap-10
+                p-6 lg:p-12 rounded-3xl shadow-xl hover:shadow-2xl 
                 transform transition-all duration-500 hover:scale-[1.03]
-                text-white ${index % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}
+                bg-white/30 dark:bg-gray-800/40 backdrop-blur-2xl 
+                border border-white/20 dark:border-gray-700/40
+                ${index % 2 !== 0 ? 'lg:flex-row-reverse' : ''}`}
             >
               {/* Text Section */}
               <motion.div
@@ -81,10 +91,13 @@ export default function Features() {
                 transition={{ duration: 0.6, delay: 0.1 }}
                 viewport={{ once: true }}
               >
-                <h2 className="text-3xl md:text-4xl font-bold drop-shadow-md">
-                  {feature.title}
-                </h2>
-                <p className="mt-4 text-lg leading-relaxed text-white/90">
+                <div className="flex items-center gap-3 mb-4">
+                  {feature.icon}
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+                    {feature.title}
+                  </h2>
+                </div>
+                <p className="mt-2 text-lg leading-relaxed text-gray-700 dark:text-gray-300">
                   {feature.desc}
                 </p>
               </motion.div>
@@ -93,7 +106,7 @@ export default function Features() {
               <motion.div
                 whileHover={{ scale: 1.05, rotate: 0.5 }}
                 transition={{ duration: 0.3 }}
-                className="lg:w-1/2 w-full overflow-hidden rounded-3xl shadow-xl hover:shadow-btnbg2/50"
+                className="lg:w-1/2 w-full overflow-hidden rounded-2xl shadow-lg hover:shadow-[#6be0ff]/40"
               >
                 <video
                   src={feature.video}
@@ -102,7 +115,7 @@ export default function Features() {
                   loop
                   playsInline
                   preload="metadata"
-                  className="w-full h-full object-cover rounded-3xl"
+                  className="w-full h-full object-cover rounded-2xl"
                   onError={(e) =>
                     safeLog('Video load error:', (e.target as HTMLVideoElement).src)
                   }
@@ -113,8 +126,8 @@ export default function Features() {
         </motion.div>
       </div>
 
-      {/* Subtle Glow Layer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-btnBg/5 to-transparent dark:from-btnbg2/10 pointer-events-none"></div>
+      {/* Subtle overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#7d68ff]/5 via-transparent to-[#6be0ff]/5 pointer-events-none"></div>
     </section>
   );
 }

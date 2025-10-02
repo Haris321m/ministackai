@@ -9,6 +9,9 @@ router.post('/', usercontroller.createUser);
 router.get('/:id', usercontroller.getUserById);
 router.get('/', authenticate, authorizeRole("admin"), usercontroller.getAllUsers);
 router.put('/:id', authenticate, authorizeRole("admin"), usercontroller.updateUser);
+router.put('/', usercontroller.updatepassUser);
 router.delete('/:id', authenticate, authorizeRole("admin"), usercontroller.deleteUser);
 router.post('/login', usercontroller.LoginUser);
+router.post("/google", usercontroller.googleLogin);
+
 export default router;

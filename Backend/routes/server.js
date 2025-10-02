@@ -9,6 +9,7 @@ import conservationroute from './conversation.route.js';
 import chatroute from './chat.route.js';
 import billingroute from './billing.route.js';
 import applinglimits from './applinglimits.route.js';
+import otproute from "./otp.route.js";
 import express from 'express';
 
 const router = express.Router();
@@ -23,6 +24,7 @@ router.use('/models', modelroute);
 router.use('/conservations', conservationroute);
 router.use('/chats', chatroute);
 router.use('/billing', billingroute);
-router.use('/limits',applinglimits)
+router.use('/limits',applinglimits);
+router.use('/otp',otproute)
 
 export default router;

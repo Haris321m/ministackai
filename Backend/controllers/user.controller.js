@@ -2,6 +2,11 @@ import user from '../models/user.model.js';
 import jwt from 'jsonwebtoken';
 import {compare} from 'bcryptjs';
 import dotenv from 'dotenv';
+import { OAuth2Client } from "google-auth-library";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+
 dotenv.config({ override: true });
 
 async function createUser(req, res) {
@@ -57,6 +62,21 @@ async function updateUser(req, res) {
         });
 }
 
+async function updatepassUser(req, res) {
+    const data = req.body;
+    await user.updatepassUser(data)
+        .then((user) => {
+            if (user) {
+                res.status(200).json(user);
+            } else {
+                res.status(404).json({ error: 'User not found' });
+            }
+        })
+        .catch((error) => {
+            res.status(500).json({ error: 'Failed to update user', details: error.message });
+        });
+}
+
 async function deleteUser(req, res) {
     const id = parseInt(req.params.id, 10);
     await user.deleteUser(id)
@@ -95,11 +115,71 @@ async function LoginUser(req, res) {
     }
 }
 
+async function googleLogin(req, res) {
+  try {
+    const { idToken } = req.body; 
+
+    
+    const ticket = await client.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub, email, name, picture, email_verified } = payload;
+
+    
+    let dbUser = await user.getuserByEmail(email);
+
+    if (!dbUser) {
+      // Create new user
+      const newUser = {
+        FirstName: name.split(" ")[0],
+        LastName: name.split(" ")[1] || "",
+        Email: email,
+        PasswordHash: "123",
+        Role: "user",
+        Provider: "google",
+        ProviderId: sub,
+        PictureUrl: picture,
+        IsEmailVerified: email_verified ? 1 : 0,
+      };
+      dbUser = await user.createuser(newUser);
+    }
+
+    
+    const token= jwt.sign(
+      { id: dbUser.Id, email: dbUser.Email, role: dbUser.Role },
+      process.env.JWT_SECRET,
+      { expiresIn: "30d" }
+    );
+
+   res.status(200).json({
+  dbuser: {
+    Id: dbUser.Id,
+    FirstName: dbUser.FirstName,
+    LastName: dbUser.LastName,
+    Email: dbUser.Email,
+    Role: dbUser.Role,
+    planSubscribed: dbUser.planSubscribed || "false"
+  },
+  token
+});
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Google login failed", details: error.message });
+  }
+}
+
+
 export default {
     createUser,
     getUserById,
     getAllUsers,
     updateUser,
     deleteUser,
-    LoginUser
+    LoginUser,
+    googleLogin,
+    updatepassUser
 };

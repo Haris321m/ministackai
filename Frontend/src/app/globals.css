@@ -76,3 +76,12 @@ textarea::-webkit-scrollbar-thumb:hover {
   scrollbar-color: #6366f1 transparent;
 }
 
+@keyframes shine {
+  0% {
+    left: -75%;
+  }
+  100% {
+    left: 125%;
+  }
+}
+

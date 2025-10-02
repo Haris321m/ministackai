@@ -6,10 +6,28 @@ const nextConfig: NextConfig = {
   },
   devIndicators: false,
   eslint: {
-    ignoreDuringBuilds: true, 
+    ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreBuildErrors: true, 
+    ignoreBuildErrors: true,
+  },
+
+  async headers() {
+    return [
+      {
+        source: "/(.*)", // all routes
+        headers: [
+          {
+            key: "Cross-Origin-Opener-Policy",
+            value: "same-origin-allow-popups", 
+          },
+          {
+            key: "Cross-Origin-Embedder-Policy",
+            value: "unsafe-none", // prevent conflicts with COEP
+          },
+        ],
+      },
+    ];
   },
 };
 
