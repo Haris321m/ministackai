@@ -4,9 +4,10 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Lock, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
 import axios from "axios";
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageInner() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -145,5 +146,13 @@ export default function ResetPasswordPage() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="text-white text-center">Loading...</div>}>
+      <ResetPasswordPageInner />
+    </Suspense>
   );
 }
